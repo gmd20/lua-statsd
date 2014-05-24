@@ -2,8 +2,10 @@ lua-statsd
 ==========
 
 A Lua module to send statistics to Graphite， a clone of [Statsd](https://github.com/etsy/statsd)
-用Lua代码实现了类似[Statsd](https://github.com/etsy/statsd)的功能，可以用于记录counter和timer统计信息，然后通过UDP接口发送给Graphite。
-可用作监控或者统计接口，在Graphite中可以图形查看统计情况。
+
+说明
+-----
+用Lua代码实现了类似[Statsd](https://github.com/etsy/statsd)的功能，可以记录counter和timer统计信息，然后通过UDP接口发送给Graphite。可用作程序的监控或者统计接口。在Graphite中可以图形查看统计情况。
 
 
 使用例子
@@ -16,27 +18,11 @@ local s = statsd.metric:new {name= "testing_metric"}
 
 
 s:starttimer()
-socket.select(nil, nil, 3)
-s:stoptimer()
-
-s:starttimer()
 socket.select(nil, nil, 1)
 s:stoptimer()
 
 s:starttimer()
 socket.select(nil, nil, 0.01)
-s:stoptimer()
-
-s:starttimer()
-socket.select(nil, nil, 0.05)
-s:stoptimer()
-
-s:starttimer()
-socket.select(nil, nil, 0.34)
-s:stoptimer()
-
-s:starttimer()
-socket.select(nil, nil, 0.123)
 s:stoptimer()
 
 s:starttimer()
@@ -76,7 +62,7 @@ print(" used time: ".. duration .."ms")
 查看直方图（histogram）
 -----------------------
 
-···
+```
 http://localhost:9000/render/?height=300&
 width=740&from=-24h&title=Render time histogram&
 vtitle=relative frequency in %&yMax=100&
@@ -90,9 +76,9 @@ target=alias(color(scale(divideSeries(stats.timers.render_time.bin_10,stats.time
 target=alias(color(scale(divideSeries(stats.timers.render_time.bin_50,stats.timers.render_time.count),100),'FF1E00'),'50')&
 target=alias(color(scale(divideSeries(stats.timers.render_time.bin_inf,stats.timers.render_time.count),100),'FF0000'),'inf')&
 lineMode=slope&areaMode=stacked&drawNullAsZero=false&hideLegend=false
-···
+```
 
-···
+```
 http://localhost:9000/render/?height=300&
 width=740&from=-24h&title=Render time histogram&
 vtitle=relative frequency in %, leaving out first class&
@@ -105,9 +91,9 @@ target=alias(color(scale(divideSeries(stats.timers.render_time.bin_10,stats.time
 target=alias(color(scale(divideSeries(stats.timers.render_time.bin_50,stats.timers.render_time.count),100),'FF1E00'),'50')&
 target=alias(color(scale(divideSeries(stats.timers.render_time.bin_inf,stats.timers.render_time.count),100),'FF0000'),'inf')&
 lineMode=slope&areaMode=stacked&drawNullAsZero=false&hideLegend=false
-···
+```
 
-···
+```
 http://localhost:9000/render/?height=300&
 width=740&from=-24h&title=Render time histogram&
 vtitle=rel. freq with scale adjustment per band&
@@ -121,7 +107,7 @@ target=alias(color(scale(divideSeries(stats.timers.render_time.bin_10,stats.time
 target=alias(color(scale(divideSeries(stats.timers.render_time.bin_50,stats.timers.render_time.count),40),'FF1E00'),'50')&
 target=alias(color(scale(divideSeries(stats.timers.render_time.bin_inf,stats.timers.render_time.count),60),'FF0000'),'inf')&
 lineMode=slope&areaMode=stacked&drawNullAsZero=false&hideLegend=false
-···
+```
 
 可以使用上面这几个Graphite的render接口调用，视图稍微有点不同，参考
 http://dieter.plaetinck.be/histogram-statsd-graphing-over-time-with-graphite.html
