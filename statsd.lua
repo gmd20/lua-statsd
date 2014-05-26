@@ -259,7 +259,6 @@ end
 function metric:stoptimer (start_time)
   local t0 = start_time or self.start_time
   local t1 = socket.gettime()
-  local t1 = 0
   local duration = math.floor((t1-t0)*1000)
   -- print(self.name ..  " used time: ".. duration .."ms")
 
