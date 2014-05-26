@@ -1,4 +1,4 @@
--- require('mobdebug').start("192.168.56.1")
+-- -- require('mobdebug').start("192.168.56.1")
 --
 local os     = require "os"
 local math   = require "math"
@@ -28,15 +28,16 @@ graphite_udp:setpeername(GRAPHITE_IP, GRAPHITE_PORT)
 math.randomseed(os.time())
 
 --[[
+--http://graphite.readthedocs.org/en/latest/feeding-carbon.html#the-plaintext-protocol
 Graphite metrics should use the following format:
 
-metricname value [timestamp]
+metricname value timestamp
 
 metricname is a period-delimited path, such as servers.mario.memory.free The periods will turn each path component into a sub-tree. The graphite project website has some metric naming advice.
 
 value is an integer or floating point number.
 
-timestamp (optional) is a UNIX timestamp, which is the number of seconds since Jan 1st 1970 (always UTC, never local time). If no timestamp is provided, the current time will be assumed. This is probably 鈥済ood enough鈥?for most uses.
+timestamp  is a UNIX timestamp, which is the number of seconds since Jan 1st 1970 (always UTC, never local time) .
 
 You can send multiple metric values at the same time by putting them on separate lines in the same message:
 --]]
@@ -68,8 +69,7 @@ function flush_metric(metric_t, current_time)
     return
   end
 
-  -- local timestamp = " " .. math.floor(now) .. "\n"
-  local timestamp = "\n"
+  local timestamp = " " .. math.floor(now) .. "\n"
   local buffer = {}
 
   if #(m.timers) > 0 then
