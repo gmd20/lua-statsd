@@ -1,5 +1,5 @@
--- -- require('mobdebug').start("192.168.56.1")
---
+-- require('mobdebug').start("192.168.56.1")
+
 local os     = require "os"
 local math   = require "math"
 local string = require "string"
@@ -42,10 +42,9 @@ timestamp  is a UNIX timestamp, which is the number of seconds since Jan 1st 197
 You can send multiple metric values at the same time by putting them on separate lines in the same message:
 --]]
 function send_graphite_udp_packet(buffer)
-  --print (table.concat(buffer))
+  -- print (table.concat(buffer))
   ---[[
   if graphite_udp ~= nil then
-    -- ingore any error
     graphite_udp:send(table.concat(buffer))
   end
   ---]]
@@ -86,8 +85,8 @@ function flush_metric(metric_t, current_time)
     local cumulSumSquaresValues = {min * min}
     local i = 0
     for i = 2, count do
-      table.insert(cumulativeValues, values[i] + cumulativeValues[i-1])
-      table.insert(cumulSumSquaresValues, (values[i] * values[i]) + cumulSumSquaresValues[i-1])
+      cumulativeValues[i] = values[i] + cumulativeValues[i-1]
+      cumulSumSquaresValues[i] = (values[i] * values[i]) + cumulSumSquaresValues[i-1]
     end
 
     local sum = min
@@ -263,7 +262,7 @@ function metric:stoptimer (start_time)
   -- print(self.name ..  " used time: ".. duration .."ms")
 
   self.counter = self.counter + 1
-  table.insert(self.timers, duration)
+  self.timers[self.counter] = duration
 
   flush_metric(self, t1)
 end
