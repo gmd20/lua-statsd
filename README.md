@@ -53,7 +53,7 @@ print(" used time: ".. duration .."ms")
 
 
 windows平台的优化
-=================
+----------------
 自己用C++的std::sort替换掉table.sort之后，快了很多。再用自己实现的gettime替换掉socket.gettime()之后性能提高了6倍左右。  
 优化之后，运行 10000000 次  starttimer() stoptimer()总共消耗时间880毫秒左右。  
 对应代码在 windows_optimization_version  目录下
