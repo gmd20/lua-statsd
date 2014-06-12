@@ -27,6 +27,8 @@ local graphite_udp = socket.udp()
 graphite_udp:setpeername(GRAPHITE_IP, GRAPHITE_PORT)
 math.randomseed(os.time())
 
+
+
 --[[
 --http://graphite.readthedocs.org/en/latest/feeding-carbon.html#the-plaintext-protocol
 Graphite metrics should use the following format:
@@ -50,9 +52,10 @@ local function send_graphite_udp_packet(buffer)
   ---]]
 end
 
+
 local function flush_metric(metric_t, current_time)
   local m   = metric_t
-  local now = current_time or socket.gettime()  -- m.time()
+  local now = current_time or socket.gettime()
   if m == nil then
     return
   end
@@ -62,16 +65,15 @@ local function flush_metric(metric_t, current_time)
   if m.sample_rate ~= 1 and m.sample_rate <= math.random() then
     -- ignore this sampling
     m.last_flush_time = now
-    if m.reset_after_flush == true then
-      m:reset()
-    end
+    m:reset()
     return
   end
 
   local timestamp = " " .. math.floor(now) .. "\n"
   local buffer = {}
 
-  if #(m.timers) > 0 then
+  if m.timers[1] ~= nil then
+  -- if #(m.timers) > 0 then
     -- timer --
     table.sort(m.timers)
     -- print (table.concat(m.timers, " "))
@@ -81,8 +83,14 @@ local function flush_metric(metric_t, current_time)
     local min    = values[1]
     local max    = values[count]
 
-    local cumulativeValues = {min}
-    local cumulSumSquaresValues = {min * min}
+    -- avoid creating table here, the performance increases about 30%
+    -- local cumulativeValues = {min}
+    -- local cumulSumSquaresValues = {min * min}
+    local cumulativeValues = m.cumulativeValues
+    local cumulSumSquaresValues = m.cumulSumSquaresValues
+    cumulativeValues[1] = min
+    cumulSumSquaresValues[1] = min * min
+
     local i = 0
     for i = 2, count do
       cumulativeValues[i] = values[i] + cumulativeValues[i-1]
@@ -203,9 +211,7 @@ local function flush_metric(metric_t, current_time)
   send_graphite_udp_packet(buffer)
 
   m.last_flush_time = now
-  if m.reset_after_flush == true then
-    m:reset()
-  end
+  m:reset()
 end
 
 ----------------------------------------------
@@ -215,13 +221,17 @@ local metric = {
   start_time        = 0,
   flush_intervals   = DEFAULT_FLUSH_INTERVALS,
   last_flush_time   = 0,
-  reset_after_flush = true,
   ----------------
   counter           = 0,
   timers            = {},
   pctThreshold      = DEFAULT_PERCENTAGE_THRESHOLD,
   sample_rate       = DEFAULT_SAMPLE_RATE,
-  histogram_bins    = DEFAULT_HISTOGRAM_BINS
+  histogram_bins    = DEFAULT_HISTOGRAM_BINS,
+
+  ----------------
+  -- avoid creating temp table in flush_metric
+  cumulativeValues = {},
+  cumulSumSquaresValues = {}
 }
 
 function metric:new (o)
@@ -235,7 +245,8 @@ end
 function metric:reset()
   self.start_time  = 0
   self.counter     = 0
-  self.timers      = {}
+  self.timers[1]   = nil
+  -- self.timers      = {}
 end
 
 function metric:increment (value)
@@ -258,6 +269,7 @@ end
 function metric:stoptimer (start_time)
   local t0 = start_time or self.start_time
   local t1 = socket.gettime()
+
   local duration = math.floor((t1-t0)*1000)
   -- print(self.name ..  " used time: ".. duration .."ms")
 
