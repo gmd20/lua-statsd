@@ -15,7 +15,7 @@ s:stoptimer()
 --]]
 
 
-local GRAPHITE_IP                  = "192.168.30.169"
+local GRAPHITE_IP                  = "192.168.100.88"
 local GRAPHITE_PORT                = 2013
 local DEFAULT_FLUSH_INTERVALS      = 10         -- flush the metrics to graphite every n seconds
 local MAX_COUNTER                  = 4096 * 8   -- flush the metrics to graphite once the counter is larger than this
@@ -36,7 +36,7 @@ void quick_sort(int * buf, int size);
 double gettime();
 ]]
 local int_buffer = ffi.new("int[?]", MAX_COUNTER)
-function quick_sort(array, count)
+local function quick_sort(array, count)
   local i
   for i = 1, count do
     int_buffer[i-1] = array[i]
@@ -47,7 +47,7 @@ function quick_sort(array, count)
   end
 end
 
-function fast_gettime()
+local function fast_gettime()
   local now = clib.gettime()
   return now
 end
@@ -69,7 +69,7 @@ timestamp  is a UNIX timestamp, which is the number of seconds since Jan 1st 197
 
 You can send multiple metric values at the same time by putting them on separate lines in the same message:
 --]]
-function send_graphite_udp_packet(buffer)
+local function send_graphite_udp_packet(buffer)
   -- print (table.concat(buffer))
   ---[[
   if graphite_udp ~= nil then
@@ -79,7 +79,7 @@ function send_graphite_udp_packet(buffer)
 end
 
 
-function flush_metric(metric_t, current_time)
+local function flush_metric(metric_t, current_time)
   local m   = metric_t
   local now = current_time or socket.gettime()  -- m.time()
   if m == nil then
@@ -240,7 +240,7 @@ end
 
 ----------------------------------------------
 
-metric = {
+local metric = {
   name              = "unknown",
   start_time        = 0,
   flush_intervals   = DEFAULT_FLUSH_INTERVALS,
